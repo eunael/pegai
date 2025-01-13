@@ -32,3 +32,8 @@ services:
             $accessKeyId: '%env(AWS_ACCESS_KEY_ID)%'
             $secretAccessKey: '%env(AWS_SECRET_ACCESS_KEY)%'
             $endpoint: '%env(AWS_ENDPOINT)%'
+    App\Service\FileFetcherService:
+        arguments:
+            $s3Client: '@App\Service\S3ClientService'
+            $httpClient: '@http_client'
+        

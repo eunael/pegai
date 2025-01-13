@@ -10,7 +10,7 @@ class S3ClientService
     private S3Client $s3Client;
 
     public function __construct(
-        string $bucketName,
+        private string $bucketName,
         string $accessKeyId,
         string $secretAccessKey,
         string $endpoint
