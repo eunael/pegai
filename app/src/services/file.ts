@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -25,5 +25,13 @@ export class FileService {
     const url = this.baseUrl.concat(this.downloadUrl).replace(':id', `${id}`)
 
     return this.http.get(url)
+  }
+
+  uploadFile(file: File, signedUrl: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': file.type, // Define o tipo do arquivo corretamente
+    });
+
+    return this.http.put(signedUrl, file, { headers, reportProgress: true, observe: 'events' });
   }
 }

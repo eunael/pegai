@@ -10,6 +10,8 @@ import { FileService } from '../../../services/file';
 })
 export class HomeComponent {
 
+  public downloadUrl: String = '';
+
   constructor(private fileService: FileService) { }
 
   // ngOnInit() {
@@ -34,7 +36,17 @@ export class HomeComponent {
 
       this.fileService.getUploadUrl(name, type, size).subscribe(
         (data) => {
-          console.log(data)
+          const signedUrl = data.signedUrl
+          const fileId = data.file
+
+          this.fileService.uploadFile(file, signedUrl).subscribe(
+            (data) => {
+              console.log(data)
+            },
+            (error) => {
+              console.log('Error ao realizar upload-storage:', error)
+            }
+          )
         },
         (error) => {
           console.log('Error ao realizar upload:', error)
