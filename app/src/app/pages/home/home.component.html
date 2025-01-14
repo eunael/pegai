@@ -1,0 +1,28 @@
+<main class="h-screen flex flex-col justify-between">
+  <header class="w-full">
+    <div class="mx-auto max-w-[48rem] px-4">
+      <div class="w-full py-8 text-center text-4xl font-bold">
+        Pegai
+      </div>
+    </div>
+  </header>
+
+  <section class="w-full flex-grow">
+    <div class="mx-auto max-w-[48rem] px-4 h-full">
+      <div class="w-full py-8 flex justify-center items-center h-full">
+        <form>
+          <label for="fileInput">Selecione um arquivo:</label>
+          <input type="file" id="fileInput" (change)="onFileSelected($event)" />
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="w-full">
+    <div class="mx-auto max-w-[48rem] px-4">
+      <div class="w-full py-8 text-center">
+        &copy;
+      </div>
+    </div>
+  </footer>
+</main>
