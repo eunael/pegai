@@ -49,6 +49,26 @@ php bin/console doctrine:migrations:migrate
 - Crie um bucket
 - Gere um API token do tipo "Leitura/gravação para objeto", aplique para um bucket específico e gere
 - Com os dados do token e o nome do bucket, preecha as suas variáveis de ambientes AWS_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT
+- Para evitar erro de CORS enquanto testa localmente, adicione essa configuração de CORS no bucket
+```
+[
+  {
+    "AllowedOrigins": [
+      "*"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "DELETE"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ]
+  }
+]
+```
 
 5. Suba o serve da aplicação
 ```

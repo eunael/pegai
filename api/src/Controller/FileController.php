@@ -33,20 +33,6 @@ class FileController extends AbstractController
         $this->fileFetcher = $fileFetcher;
     }
 
-    #[Route('/file', name: 'app_index', methods: ['GET'])]
-    public function index(): JsonResponse
-    {
-        $s3Client = $this->s3ClientService->getClient();
-
-        $contents = $s3Client->listObjectsV2([
-            'Bucket' => $this->getParameter('aws.bucket_name')
-        ]);
-
-        dd($contents['Content']);
-
-        return $this->json([]);
-    }
-
     #[Route('/upload', name: 'app_upload', methods: ['POST', 'OPTIONS'])]
     public function upload(Request $request): JsonResponse
     {
@@ -80,30 +66,20 @@ class FileController extends AbstractController
         ]);
     }
 
-    #[Route('/download/{file}', name: 'app_download', methods: ['GET'])]
-    public function download(File $file): JsonResponse
+    #[Route('/preview/{file}', name: 'file_preview', methods: ['GET'])]
+    public function preview(File $file)
     {
-        // retorna uma url de download, mas eu quero fazer um preview
-        $signedUrl = $this->fileFetcher->getUrl($file);
+        // TODO: tratar outros tipos de arquivos além do PDF
 
-        return $this->json([
-            'signedUrl' => $signedUrl
-        ]);
+        try {
+            [$content, $contentType]  = $this->fileFetcher->getContent($file);
+
+            return new Response($content, Response::HTTP_OK, [
+                'Content-Type' => $contentType,
+                'Content-Disposition' => 'inline; filename="preview.pdf"',
+            ]);
+        } catch (\Exception $e) {
+            return new Response('Erro ao buscar o arquivo: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-
-    // WIP
-    // #[Route('/preview/{file}', name: 'file_preview', methods: ['GET'])]
-    // public function preview(File $file)
-    // {
-    //     try {
-    //         [$content, $contentType]  = $this->fileFetcher->getContent($file);
-
-    //         return new Response($content, Response::HTTP_OK, [
-    //             'Content-Type' => $contentType,
-    //             'Content-Disposition' => 'inline; filename="preview.pdf"',
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return new Response('Erro ao buscar o arquivo: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
 }

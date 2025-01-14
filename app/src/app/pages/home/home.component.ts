@@ -10,7 +10,7 @@ import { FileService } from '../../../services/file';
 })
 export class HomeComponent {
 
-  public downloadUrl: String = '';
+  public previewUrl: String = '';
 
   constructor(private fileService: FileService) { }
 
@@ -41,7 +41,10 @@ export class HomeComponent {
 
           this.fileService.uploadFile(file, signedUrl).subscribe(
             (data) => {
-              console.log(data)
+              if(data.ok) {
+                this.previewUrl = this.fileService.getPreviewUrl(fileId)
+                console.log(this.previewUrl);
+              }
             },
             (error) => {
               console.log('Error ao realizar upload-storage:', error)
