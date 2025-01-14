@@ -27,6 +27,8 @@ APP_SECRET=
 
 DATABASE_URL="sqlite:///%kernel.project_dir%/var/app.db"
 
+CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+
 AWS_BUCKET_NAME=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=

@@ -2,20 +2,20 @@
 
 namespace App\Service;
 
+use App\Interfaces\CloudflareClientInterface;
 use Aws\Credentials\Credentials;
 use Aws\S3\S3Client;
 
-class S3ClientService
+class CloudflareClientService implements CloudflareClientInterface
 {
     private S3Client $s3Client;
 
     public function __construct(
-        private string $bucketName,
+        private readonly string $bucketName,
         string $accessKeyId,
         string $secretAccessKey,
         string $endpoint
-    )
-    {
+    ) {
         $credentials = new Credentials($accessKeyId, $secretAccessKey);
 
         $this->s3Client = new S3Client([

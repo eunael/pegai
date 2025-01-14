@@ -26,7 +26,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Service\S3ClientService:
+    App\Service\CloudflareClientService:
         arguments:
             $bucketName: '%env(AWS_BUCKET_NAME)%'
             $accessKeyId: '%env(AWS_ACCESS_KEY_ID)%'
@@ -34,6 +34,11 @@ services:
             $endpoint: '%env(AWS_ENDPOINT)%'
     App\Service\FileFetcherService:
         arguments:
-            $s3Client: '@App\Service\S3ClientService'
+            $cloudflareClient: '@App\Service\CloudflareClientService'
             $httpClient: '@http_client'
+    App\Service\FileUploaderService:
+        arguments:
+            $url: ''
+            $key: ''
+            $cloudflareClient: '@App\Service\CloudflareClientService'
         
