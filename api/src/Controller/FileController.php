@@ -47,12 +47,14 @@ class FileController extends AbstractController
         return $this->json([]);
     }
 
-    #[Route('/upload', name: 'app_upload', methods: ['POST'])]
+    #[Route('/upload', name: 'app_upload', methods: ['POST', 'OPTIONS'])]
     public function upload(Request $request): JsonResponse
     {
-        $name = $request->request->get('name');
-        $size = $request->request->get('size');
-        $type = $request->request->get('type');
+        $request = $request->toArray();
+
+        $name = $request['name'];
+        $size = $request['size'];
+        $type = $request['type'];
 
         $fileKey = uniqid(more_entropy: true) . '-' . $name;
 
@@ -64,9 +66,9 @@ class FileController extends AbstractController
             'ContentType' => $type
         ]);
 
-        $request = $s3->createPresignedRequest($cmd, '+5 minutes');
+        $presignedRequest = $s3->createPresignedRequest($cmd, '+5 minutes');
 
-        $signedUrl = (string) $request->getUri();
+        $signedUrl = (string) $presignedRequest->getUri();
 
         $file = new File($name, $size, $type, $fileKey);
 
@@ -95,7 +97,7 @@ class FileController extends AbstractController
     // {
     //     try {
     //         [$content, $contentType]  = $this->fileFetcher->getContent($file);
-            
+
     //         return new Response($content, Response::HTTP_OK, [
     //             'Content-Type' => $contentType,
     //             'Content-Disposition' => 'inline; filename="preview.pdf"',
