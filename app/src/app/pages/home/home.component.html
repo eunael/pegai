@@ -25,15 +25,20 @@
               [class.border-blue-500]="isDragging"
               onclick="document.getElementById('input-file').click()"
             >
-              @if(file !== null) {
-                <p class="text-blue-500 font-semibold flex flex-col justify-center items-center gap-6">
-                  <icon-circle-check />
+              @if(file !== null && !inProgress) {
+                <p class="text-blue-500 font-semibold flex flex-col justify-center items-center gap-4">
+                  <icon-circle-check class="animate-pulse" />
                   {{ file.name }}
                 </p>
               } @else {
-                <p class="text-gray-500 flex flex-col justify-center items-center gap-6">
-                  <icon-download />
-                  Arraste e solte um arquivo aqui ou clique para selecionar.
+                <p class="text-gray-500 flex flex-col justify-center items-center gap-4">
+                  @if(inProgress) {
+                    <icon-file-text class="animate-spin" />
+                    Carregando. Por favor, aguarde...
+                  } @else {
+                    <icon-download class="animate-bounce" />
+                    Arraste e solte um arquivo aqui ou clique para selecionar.
+                  }
                 </p>
               }
               <input
@@ -44,7 +49,7 @@
               />
             </div>
 
-            @if(previewUrl) {
+            @if(previewUrl && !inProgress) {
               <div class="sm:w-[24rem] w-full flex border-2 border-blue-500 rounded-lg mt-6">
                 <div id="preview-url" class="flex-grow text-gray-500 truncate text-nowrap cursor-pointer flex items-center" [title]="previewUrl">
                     <a [href]="previewUrl" target="_blank" class="p-4 w-full">

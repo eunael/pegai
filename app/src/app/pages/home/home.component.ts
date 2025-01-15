@@ -4,17 +4,18 @@ import { DownloadComponent } from '../../icons/download/download.component';
 import { CheckComponent } from '../../icons/check/check.component';
 import { CopyComponent } from '../../icons/copy/copy.component';
 import { CircleCheckComponent } from '../../icons/circle-check/circle-check.component';
+import { FileTextComponent } from '../../icons/file-text/file-text.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [DownloadComponent, CheckComponent, CircleCheckComponent, CopyComponent],
+  imports: [DownloadComponent, CheckComponent, CircleCheckComponent, CopyComponent, FileTextComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-
-  public previewUrl: string = '';
+  inProgress: boolean = false;
+  previewUrl: string = '';
   isDragging = false;
   file: File | null = null
   icon: 'copy' | 'check' = 'copy';
@@ -56,6 +57,8 @@ export class HomeComponent {
 
   uploadFile()
   {
+    this.inProgress = true;
+
     if (this.file) {
       const file = this.file
       const name = file.name;
@@ -67,19 +70,16 @@ export class HomeComponent {
           const signedUrl = data.signedUrl
           const fileId = data.file
 
-          this.fileService.uploadFile(file, signedUrl).subscribe(
-            (data) => {
-              if(data.ok) {
+          this.fileService.uploadFile(file, signedUrl).subscribe({
+            error: (e) => console.error('Error ao realizar upload-storage:', e),
+            complete: () => {
                 this.previewUrl = this.fileService.getPreviewUrl(fileId)
-              }
-            },
-            (error) => {
-              console.log('Error ao realizar upload-storage:', error)
+                this.inProgress = false;
             }
-          )
+          })
         },
         (error) => {
-          console.log('Error ao realizar upload:', error)
+          console.error('Error ao realizar upload:', error)
         }
       )
     }
