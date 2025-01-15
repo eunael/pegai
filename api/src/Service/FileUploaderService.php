@@ -27,7 +27,7 @@ class FileUploaderService implements FileUploaderInterface
             'ContentType' => $type
         ]);
         
-        $presignedRequest = $s3->createPresignedRequest($cmd, '+5 minutes');
+        $presignedRequest = $s3->createPresignedRequest($cmd, '+60 seconds');
 
         $this->url = (string) $presignedRequest->getUri();
     }

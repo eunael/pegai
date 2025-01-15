@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 class FileController extends AbstractController
@@ -18,18 +20,21 @@ class FileController extends AbstractController
         private readonly FileRepository $fileRepository,
         private readonly FileFetcherInterface $fileFetcher,
         private readonly FileUploaderInterface $fileUploader,
+        private readonly RateLimiterFactory $anonymousApiLimiter,
     ) {
-    }
-
-    #[Route('/file', name: "app_index_file", methods: ['GET'])]
-    public function indexFile()
-    {
-        return $this->json(['oi']);
     }
 
     #[Route('/upload', name: 'app_upload', methods: ['POST', 'OPTIONS'])]
     public function upload(Request $request): JsonResponse
     {
+        $limiter = $this->anonymousApiLimiter->create($request->getClientIp());
+
+        if(false === $limiter->consume(1)->isAccepted()) {
+            return $this->json([
+                'message' => 'Too many request. Please try again soon.'
+            ], Response::HTTP_TOO_MANY_REQUESTS);
+        }
+
         $request = $request->toArray();
         $name = $request['name'];
         $size = $request['size'];

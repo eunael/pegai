@@ -19,6 +19,7 @@ export class HomeComponent {
   isDragging = false;
   file: File | null = null
   icon: 'copy' | 'check' = 'copy';
+  msgError: string = '';
 
   constructor(private fileService: FileService) { }
 
@@ -57,6 +58,7 @@ export class HomeComponent {
 
   uploadFile()
   {
+    this.msgError = ''
     this.inProgress = true;
 
     if (this.file) {
@@ -65,27 +67,27 @@ export class HomeComponent {
       const type = file.type;
       const size = file.size;
 
-      this.fileService.getUploadUrl(name, type, size).subscribe(
-        (data) => {
+      this.fileService.getUploadUrl(name, type, size).subscribe({
+        next: (data) => {
           const signedUrl = data.signedUrl
           const fileId = data.file
 
           this.fileService.uploadFile(file, signedUrl).subscribe({
-            error: (e) => console.error('Error ao realizar upload-storage:', e),
+            error: (e) => {this.msgError = 'Erro when perfoming upload-storage', this.inProgress = false; this.file = null},
             complete: () => {
                 this.previewUrl = this.fileService.getPreviewUrl(fileId)
                 this.inProgress = false;
             }
           })
         },
-        (error) => {
-          console.error('Error ao realizar upload:', error)
-        }
-      )
+        error: (e) => {this.msgError = e.error.message; this.inProgress = false; this.file = null}
+      })
     }
   }
 
   copyToClipboard(): void {
+    this.msgError = ''
+
     navigator.clipboard.writeText(this.previewUrl).then(
       () => {
         this.icon = 'check';
@@ -95,7 +97,7 @@ export class HomeComponent {
         }, 3000);
       },
       (err) => {
-        console.error('Erro ao copiar texto:', err);
+        this.msgError = 'Erro ao copiar texto';
       }
     );
   }

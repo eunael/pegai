@@ -49,6 +49,12 @@
               />
             </div>
 
+            @if(msgError) {
+              <div class="p-4 text-red-500 w-full text-center">
+                Error: {{msgError}}
+              </div>
+            }
+
             @if(previewUrl && !inProgress) {
               <div class="sm:w-[24rem] w-full flex border-2 border-blue-500 rounded-lg mt-6">
                 <div id="preview-url" class="flex-grow text-gray-500 truncate text-nowrap cursor-pointer flex items-center" [title]="previewUrl">
