@@ -21,7 +21,7 @@ export class FileService {
   }
 
   // return { url: string }
-  getPreviewUrl(id: Number): String {
+  getPreviewUrl(id: Number): string {
 
     return this.baseUrl.concat(this.previewUrl).replace(':id', `${id}`)
   }

@@ -9,16 +9,58 @@
 
   <section class="w-full flex-grow">
     <div class="mx-auto max-w-[48rem] px-4 h-full">
-      <div class="w-full py-8 flex justify-center items-center h-full">
-        <div>
-          <form>
-            <label for="fileInput">Selecione um arquivo:</label>
-            <input type="file" id="fileInput" (change)="onFileSelected($event)" />
-          </form>
+      <div class="w-full py-8 flex flex-col justify-center items-center h-full">
+        <div class="text-center">
+          <p class="text-2xl font-bold mb-4">"Pegaí o arquivo que mandei"</p>
+          <p class="text-lg">Compartilhe arquivos de forma fácil com quem você quiser.</p>
+        </div>
+        <div class="flex-grow flex justify-center items-center">
+          <div class="px-4">
+            <div
+              class="sm:w-[24rem] w-full px-4 py-8 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-500 transition text-center text-lg"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+              [class.bg-gray-100]="isDragging"
+              [class.border-blue-500]="isDragging"
+              onclick="document.getElementById('input-file').click()"
+            >
+              @if(file !== null) {
+                <p class="text-blue-500 font-semibold flex flex-col justify-center items-center gap-6">
+                  <icon-circle-check />
+                  {{ file.name }}
+                </p>
+              } @else {
+                <p class="text-gray-500 flex flex-col justify-center items-center gap-6">
+                  <icon-download />
+                  Arraste e solte um arquivo aqui ou clique para selecionar.
+                </p>
+              }
+              <input
+                id="input-file"
+                type="file"
+                class="hidden"
+                (change)="onFileSelect($event)"
+              />
+            </div>
 
-          @if(previewUrl) {
-            <p>preview: <a [href]="previewUrl" target="_blank" class="text-blue-500 underline">visualizar</a></p>
-          }
+            @if(previewUrl) {
+              <div class="sm:w-[24rem] w-full flex border-2 border-blue-500 rounded-lg mt-6">
+                <div id="preview-url" class="flex-grow text-gray-500 truncate text-nowrap cursor-pointer flex items-center" [title]="previewUrl">
+                    <a [href]="previewUrl" target="_blank" class="p-4 w-full">
+                      {{previewUrl}}
+                    </a>
+                </div>
+                <div id="btn-copy" class="border-l-2 border-blue-500 bg-blue-500 text-center p-4 pl-4 cursor-pointer" title="Copiar" (click)="copyToClipboard()">
+                  @if(icon === 'copy') {
+                    <icon-copy />
+                  } @else if(icon === 'check') {
+                    <icon-check />
+                  }
+                </div>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -27,7 +69,7 @@
   <footer class="w-full">
     <div class="mx-auto max-w-[48rem] px-4">
       <div class="w-full py-8 text-center">
-        &copy;
+        2025©, Feito com 🙂 por <a href="https://github.com/eunael" target="_blank">eunael</a>.
       </div>
     </div>
   </footer>
