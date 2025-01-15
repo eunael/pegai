@@ -5,6 +5,39 @@ import { CheckComponent } from '../../icons/check/check.component';
 import { CopyComponent } from '../../icons/copy/copy.component';
 import { CircleCheckComponent } from '../../icons/circle-check/circle-check.component';
 import { FileTextComponent } from '../../icons/file-text/file-text.component';
+import { z } from 'zod';
+
+const fileSchema = z.object({
+  name: z
+    .string()
+    .nonempty("O nome do arquivo é obrigatório")
+    .max(255, "O nome do arquivo deve ter no máximo 255 caracteres"),
+  size: z
+    .number()
+    .min(1, "O tamanho do arquivo é obrigatório")
+    .max(200 * 1024 * 1024, "O tamanho do arquivo não pode exceder 200MB"), // Convertendo 200MB para bytes
+  type: z
+    .string()
+    .regex(/\w+\/[-+.\w]+/, "O tipo do arquivo deve seguir o padrão MIME"),
+});
+
+const invalidMimeTypes = ['application/x-msdownload', 'application/x-msdos-program', 'application/x-shellscript', 'application/x-sh', 'application/x-cgi', 'application/java-archive', 'application/x-executable'];
+
+const validateFile = (file: { name: string; size: number; type: string }) => {
+  const validationResult = fileSchema.safeParse(file);
+  if (!validationResult.success) {
+    throw new Error(
+      validationResult.error.errors.map((err) => err.message).join(", ")
+    );
+  }
+
+  // Validar o mime type
+  if (invalidMimeTypes.includes(file.type)) {
+    throw new Error("O tipo MIME do arquivo não é permitido");
+  }
+
+  return true;
+};
 
 @Component({
   selector: 'app-home',
@@ -66,6 +99,16 @@ export class HomeComponent {
       const name = file.name;
       const type = file.type;
       const size = file.size;
+
+      // try {
+      //   validateFile({
+      //     name,
+      //     size,
+      //     type,
+      //   });
+      // } catch (err: any) {
+      //   this.msgError = err.message
+      // }
 
       this.fileService.getUploadUrl(name, type, size).subscribe({
         next: (data) => {

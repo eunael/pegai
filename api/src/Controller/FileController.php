@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\FileDTO;
 use App\Entity\File;
 use App\Interfaces\FileFetcherInterface;
 use App\Interfaces\FileUploaderInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FileController extends AbstractController
 {
@@ -25,8 +27,9 @@ class FileController extends AbstractController
     }
 
     #[Route('/upload', name: 'app_upload', methods: ['POST', 'OPTIONS'])]
-    public function upload(Request $request): JsonResponse
+    public function upload(Request $request, ValidatorInterface $validator): JsonResponse
     {
+        //region Validate Rate limite
         $limiter = $this->anonymousApiLimiter->create($request->getClientIp());
 
         if(false === $limiter->consume(1)->isAccepted()) {
@@ -34,17 +37,30 @@ class FileController extends AbstractController
                 'message' => 'Too many request. Please try again soon.'
             ], Response::HTTP_TOO_MANY_REQUESTS);
         }
+        //endregion
 
-        $request = $request->toArray();
-        $name = $request['name'];
-        $size = $request['size'];
-        $type = $request['type'];
+        //region Validate request data
+        $data = $request->toArray();
 
-        $this->fileUploader->uploadFile($name, $size, $type);
+        $fileDTO = new FileDTO;
+        $fileDTO->name = $data['name'] ?? null;
+        $fileDTO->size = $data['size'] ?? null;
+        $fileDTO->type = $data['type'] ?? null;
+
+        $errors = $validator->validate($fileDTO);
+
+        if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                return new JsonResponse(['message' => $error->getMessage()], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        //endregion
+
+        $this->fileUploader->uploadFile($fileDTO->name, $fileDTO->size, $fileDTO->type);
         $signedUrl = $this->fileUploader->getPresignedUrl();
         $fileKey = $this->fileUploader->getFileKey();
 
-        $file = new File($name, $size, $type, $fileKey);
+        $file = new File($fileDTO->name, $fileDTO->size, $fileDTO->type, $fileKey);
         $file = $this->fileRepository->add($file);
 
         return $this->json([
