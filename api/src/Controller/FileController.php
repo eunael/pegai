@@ -50,9 +50,9 @@ class FileController extends AbstractController
         $errors = $validator->validate($fileDTO);
 
         if (count($errors) > 0) {
-            foreach ($errors as $error) {
-                return new JsonResponse(['message' => $error->getMessage()], Response::HTTP_BAD_REQUEST);
-            }
+            $error = $errors[0];
+
+            return new JsonResponse(['message' => $error->getMessage()], Response::HTTP_BAD_REQUEST);
         }
         //endregion
 
@@ -72,59 +72,12 @@ class FileController extends AbstractController
     #[Route('/preview/{file}', name: 'file_preview', methods: ['GET'])]
     public function preview(File $file)
     {
-        // TODO: tratar outros tipos de arquivos além do PDF
-
         try {
             [$content, $contentType]  = $this->fileFetcher->getFileContent($file);
 
-            // Tipos de áudio suportados
-            $audioMimeTypes = [
-                'audio/mpeg',  // MP3
-                'audio/ogg',   // Ogg Vorbis
-                'audio/wav',   // WAV
-            ];
-
-            if (in_array($contentType, $audioMimeTypes)) {
-                // Cabeçalhos específicos para áudio
-                return new Response($content, Response::HTTP_OK, [
-                    'Content-Type' => $contentType,
-                    'Content-Disposition' => 'inline; filename="' . $file->getKey() . '"',
-                    'Accept-Ranges' => 'bytes', // Necessário para reprodução progressiva
-                ]);
-            }
-
-            // Tipos de vídeo suportados
-            $videoMimeTypes = [
-                'video/mp4',  // MP4
-                'video/webm', // WebM
-                'video/ogg',  // Ogg
-            ];
-
-            if (in_array($contentType, $videoMimeTypes)) {
-                // Cabeçalhos específicos para vídeos
-                return new Response($content, Response::HTTP_OK, [
-                    'Content-Type' => $contentType,
-                    'Content-Disposition' => 'inline; filename="' . $file->getKey() . '"',
-                    'Accept-Ranges' => 'bytes', // Necessário para reprodução de vídeos
-                ]);
-            }
-
-            $inlineDisplayTypes = [
-                'application/pdf',
-                'image/jpeg',
-                'image/png',
-                'image/gif',
-                'text/plain',
-                'application/json',
-            ];
-    
-            $disposition = in_array($contentType, $inlineDisplayTypes)
-                ? 'inline'
-                : 'attachment';
-
             return new Response($content, Response::HTTP_OK, [
                 'Content-Type' => $contentType,
-                'Content-Disposition' => $disposition . '; filename="' . $file->getKey() . '"',
+                'Content-Disposition' => 'inline; filename="' . $file->getKey() . '"',
                 'Accept-Ranges' => 'bytes',
             ]);
         } catch (\Exception $e) {
