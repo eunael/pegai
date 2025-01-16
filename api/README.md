@@ -10,7 +10,7 @@ A API tem dois endpoints.
 | Endpoint  | Método | Descrição |
 | --------  | ------ | --------- |
 | /upload   | POST   | Retorna o ID do arquivo e uma url assinada para fazer upload ao informar os seguintes das do arquivo: nome, tamanho, tipo do conteúdo. |
-| /download/{id} | GET    | Passe o ID do arquivo e retornará uma url assinada para buscar o arquivo do storage. |
+| /preview/{id} | GET    | Passe o ID do arquivo e retornará uma url assinada para buscar o arquivo do storage. |
 
 Todas as URL assinada tem validade de **5 minuto** antes de expirarem.
 
