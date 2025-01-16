@@ -4,11 +4,11 @@ O Pegaí é um sistema que lhe permite fazer upload de arquivo e gerar um link d
 
 ## APP
 
-Esse é o diretório do front-end do projeto. Aqui temos foi utilizado o framewaork Angular.
+Esse é o diretório do front-end do projeto e foi utilizado o Angular.
 
 ## Como executar o projeto
 
-Primeiro, faça o clone desse repositório, entre no diretório `api` e siga os passos. Depois, basta executar:
+Primeiro, faça o clone desse repositório, entre no diretório `app`. Depois, basta executar:
 ```
 npm install
 npm run start
