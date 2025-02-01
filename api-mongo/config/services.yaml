@@ -1,0 +1,46 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    env(MONGODB_URL): ''
+    env(MONGODB_DB): ''
+    aws.bucket_name: '%env(AWS_BUCKET_NAME)%'
+    aws.access_key_id: '%env(AWS_ACCESS_KEY_ID)%'
+    aws.secret_access_key: '%env(AWS_SECRET_ACCESS_KEY)%'
+    aws.endpoint: '%env(AWS_ENDPOINT)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    App\Service\CloudflareClientService:
+        arguments:
+            $bucketName: '%env(AWS_BUCKET_NAME)%'
+            $accessKeyId: '%env(AWS_ACCESS_KEY_ID)%'
+            $secretAccessKey: '%env(AWS_SECRET_ACCESS_KEY)%'
+            $endpoint: '%env(AWS_ENDPOINT)%'
+    App\Service\FileFetcherService:
+        arguments:
+            $cloudflareClient: '@App\Service\CloudflareClientService'
+            $httpClient: '@http_client'
+    App\Service\FileUploaderService:
+        arguments:
+            $url: ''
+            $key: ''
+            $cloudflareClient: '@App\Service\CloudflareClientService'
+        
