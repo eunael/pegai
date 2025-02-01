@@ -116,7 +116,7 @@ export class HomeComponent {
           const fileId = data.file
 
           this.fileService.uploadFile(file, signedUrl).subscribe({
-            error: (e) => {this.msgError = 'Erro when perfoming upload-storage', this.inProgress = false; this.file = null},
+            error: (e) => {this.msgError = 'Error when perfoming upload-storage', this.inProgress = false; this.file = null},
             complete: () => {
                 this.previewUrl = this.fileService.getPreviewUrl(fileId)
                 this.inProgress = false;
